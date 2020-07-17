@@ -11,7 +11,7 @@
 #include <math.h>
 
 // Print progress to console while loading (large models)
-#define OBJL_CONSOLE_OUTPUT
+//#define OBJL_CONSOLE_OUTPUT
 
 // Namespace: OBJL
 //
@@ -150,7 +150,7 @@ struct Material
   // Specular Color
   Vector3 Ks;
   // Specular Exponent
-  float Ns{0.0f};
+  float Ns{30.0f};
   // Optical Density
   float Ni{0.0f};
   // Dissolve
@@ -429,6 +429,9 @@ public:
 
       pathtomat += fileName;
 
+#ifdef OBJL_CONSOLE_OUTPUT
+      std::cout << "Load material: " << pathtomat << std::endl;
+#endif
 
       std::ifstream mtlStream(pathtomat);
 
