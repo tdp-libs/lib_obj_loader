@@ -154,7 +154,7 @@ struct Material
   // Optical Density
   float Ni{0.0f};
   // Dissolve
-  float d{0.0f};
+  float d{1.0f};
   // Illumination
   int illum{0};
   // Ambient Texture Map
