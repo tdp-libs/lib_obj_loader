@@ -11,7 +11,7 @@
 #include <math.h>
 
 // Print progress to console while loading (large models)
-#define OBJL_CONSOLE_OUTPUT
+// #define OBJL_CONSOLE_OUTPUT
 
 // Namespace: OBJL
 //
@@ -433,14 +433,11 @@ public:
       std::cout << "Load material: '" << pathtomat << "'" << std::endl;
 #endif
 
-      std::cout << "x1" << std::endl;
       std::ifstream mtlStream(pathtomat);
 
-      std::cout << "x2" << std::endl;
       if(!mtlStream.is_open())
         return;
 
-      std::cout << "x3" << std::endl;
       closure(mtlStream);
     });
   }
@@ -1001,7 +998,6 @@ private:
   // Load Materials from .mtl file
   bool LoadMaterials(std::istream& inputStream)
   {
-    std::cout << "AAA" << std::endl;
     Material tempMaterial;
 
     bool listening = false;
@@ -1010,7 +1006,6 @@ private:
     std::string curline;
     while (std::getline(inputStream, curline))
     {
-      std::cout << "BBB" << curline << std::endl;
       // new material and material name
       if (algorithm::firstToken(curline) == "newmtl")
       {
@@ -1046,7 +1041,6 @@ private:
             tempMaterial.name = "none";
           }          
         }
-        std::cout << "Found mat: " << tempMaterial.name << std::endl;
       }
       // Ambient Color
       if (algorithm::firstToken(curline) == "Ka")
