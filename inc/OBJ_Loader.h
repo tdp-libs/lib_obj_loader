@@ -301,6 +301,19 @@ bool inTriangle(Vector3 point, Vector3 tri1, Vector3 tri2, Vector3 tri3)
     return false;
 }
 
+std::string trim(const std::string& str,
+                 const std::string& whitespace = " \t\n\r")
+{
+    const auto strBegin = str.find_first_not_of(whitespace);
+    if (strBegin == std::string::npos)
+        return ""; // no content
+
+    const auto strEnd = str.find_last_not_of(whitespace);
+    const auto strRange = strEnd - strBegin + 1;
+
+    return str.substr(strBegin, strRange);
+}
+
 // Split a String into a string array at a given token
 inline void split(const std::string &in,
                   std::vector<std::string> &out,
@@ -472,6 +485,10 @@ public:
     std::string curline;
     while (std::getline(objStream, curline))
     {
+      curline = algorithm::trim(curline);
+      std::string firstToken = algorithm::firstToken(curline);
+
+
 #ifdef OBJL_CONSOLE_OUTPUT
       if ((outputIndicator = ((outputIndicator + 1) % outputEveryNth)) == 1)
       {
@@ -489,20 +506,20 @@ public:
 #endif
 
       // Generate a Mesh Object or Prepare for an object to be created
-      if (algorithm::firstToken(curline) == "o" || algorithm::firstToken(curline) == "g" || curline[0] == 'g')
+      if(firstToken == "o" || firstToken == "g") // || curline[0] == 'g'
       {
         if (!listening)
         {
           listening = true;
 
-          if (algorithm::firstToken(curline) == "o" || algorithm::firstToken(curline) == "g")
-          {
+          //if (firstToken == "o" || firstToken == "g")
+          //{
             meshname = algorithm::tail(curline);
-          }
-          else
-          {
-            meshname = "unnamed";
-          }
+          //}
+          //else
+          //{
+          //  meshname = "unnamed";
+          //}
         }
         else
         {
@@ -526,14 +543,14 @@ public:
           }
           else
           {
-            if (algorithm::firstToken(curline) == "o" || algorithm::firstToken(curline) == "g")
-            {
+            //if (firstToken == "o" || firstToken == "g")
+            //{
               meshname = algorithm::tail(curline);
-            }
-            else
-            {
-              meshname = "unnamed";
-            }
+            //}
+            //else
+            //{
+            //  meshname = "unnamed";
+            //}
           }
         }
 #ifdef OBJL_CONSOLE_OUTPUT
@@ -541,8 +558,9 @@ public:
         outputIndicator = 0;
 #endif
       }
+
       // Generate a Vertex Position
-      if (algorithm::firstToken(curline) == "v")
+      if (firstToken == "v")
       {
         std::vector<std::string> spos;
         Vector3 vpos;
@@ -555,7 +573,7 @@ public:
         Positions.push_back(vpos);
       }
       // Generate a Vertex Texture Coordinate
-      if (algorithm::firstToken(curline) == "vt")
+      if (firstToken == "vt")
       {
         std::vector<std::string> stex;
         Vector2 vtex;
@@ -567,7 +585,7 @@ public:
         TCoords.push_back(vtex);
       }
       // Generate a Vertex Normal;
-      if (algorithm::firstToken(curline) == "vn")
+      if (firstToken == "vn")
       {
         std::vector<std::string> snor;
         Vector3 vnor;
@@ -580,7 +598,7 @@ public:
         Normals.push_back(vnor);
       }
       // Generate a Face (vertices & indices)
-      if (algorithm::firstToken(curline) == "f")
+      if (firstToken == "f")
       {
         // Generate the vertices
         std::vector<Vertex> vVerts;
@@ -609,9 +627,12 @@ public:
 
         }
       }
+
       // Get Mesh Material Name
-      if (algorithm::firstToken(curline) == "usemtl")
+      if(firstToken == "usemtl")
       {
+        std::string matName = algorithm::tail(curline);
+        std::cout << "usemtl: '" << matName << "' size: " << matName.size() << std::endl;
         MeshMatNames.push_back(algorithm::tail(curline));
 
         // Create new Mesh, if Material changes within a group
@@ -642,8 +663,9 @@ public:
         outputIndicator = 0;
 #endif
       }
+
       // Load Materials
-      if (algorithm::firstToken(curline) == "mtllib")
+      if (firstToken == "mtllib")
       {
         loadMTL(algorithm::tail(curline), [&](std::istream& mtlStream)
         {
@@ -727,7 +749,7 @@ private:
         break;
 
       // See What type the vertex is.
-      int vtype;
+      int vtype{0};
 
       algorithm::split(sface[i], svert, "/");
 
@@ -847,6 +869,18 @@ private:
       return;
     }
 
+    // If it is a triangle no need to calculate it
+    if (iVerts.size() == 4)
+    {
+      oIndices.push_back(0);
+      oIndices.push_back(1);
+      oIndices.push_back(2);
+      oIndices.push_back(0);
+      oIndices.push_back(2);
+      oIndices.push_back(3);
+      return;
+    }
+
     // Create a list of vertices
     std::vector<Vertex> tVerts = iVerts;
 
@@ -938,6 +972,8 @@ private:
           break;
         }
 
+        continue;
+
         // If Vertex is not an interior vertex
         float angle = math::AngleBetweenV3(pPrev.Position - pCur.Position, pNext.Position - pCur.Position) * (180.0f / 3.14159265359f);
         if (angle <= 0 && angle >= 180)
@@ -1006,16 +1042,20 @@ private:
     std::string curline;
     while (std::getline(inputStream, curline))
     {
+      curline = algorithm::trim(curline);
+      std::string firstToken = algorithm::firstToken(curline);
+
       // new material and material name
-      if (algorithm::firstToken(curline) == "newmtl")
+      if (firstToken == "newmtl")
       {
         if (!listening)
         {
           listening = true;
 
           if (curline.size() > 7)
-          {
-            tempMaterial.name = algorithm::tail(curline);
+          {            
+            tempMaterial.name = algorithm::tail(curline);            
+
           }
           else
           {
@@ -1041,9 +1081,11 @@ private:
             tempMaterial.name = "none";
           }          
         }
+
+        std::cout << "newmtl: '" << tempMaterial.name << "' size: " << tempMaterial.name.size() << std::endl;
       }
       // Ambient Color
-      if (algorithm::firstToken(curline) == "Ka")
+      if (firstToken == "Ka")
       {
         std::vector<std::string> temp;
         algorithm::split(algorithm::tail(curline), temp, " ");
@@ -1056,7 +1098,7 @@ private:
         tempMaterial.Ka.Z = std::stof(temp[2]);
       }
       // Diffuse Color
-      if (algorithm::firstToken(curline) == "Kd")
+      if (firstToken == "Kd")
       {
         std::vector<std::string> temp;
         algorithm::split(algorithm::tail(curline), temp, " ");
@@ -1069,7 +1111,7 @@ private:
         tempMaterial.Kd.Z = std::stof(temp[2]);
       }
       // Specular Color
-      if (algorithm::firstToken(curline) == "Ks")
+      if (firstToken == "Ks")
       {
         std::vector<std::string> temp;
         algorithm::split(algorithm::tail(curline), temp, " ");
@@ -1082,52 +1124,52 @@ private:
         tempMaterial.Ks.Z = std::stof(temp[2]);
       }
       // Specular Exponent
-      if (algorithm::firstToken(curline) == "Ns")
+      if (firstToken == "Ns")
       {
         tempMaterial.Ns = std::stof(algorithm::tail(curline));
       }
       // Optical Density
-      if (algorithm::firstToken(curline) == "Ni")
+      if (firstToken == "Ni")
       {
         tempMaterial.Ni = std::stof(algorithm::tail(curline));
       }
       // Dissolve
-      if (algorithm::firstToken(curline) == "d")
+      if (firstToken == "d")
       {
         tempMaterial.d = std::stof(algorithm::tail(curline));
       }
       // Illumination
-      if (algorithm::firstToken(curline) == "illum")
+      if (firstToken == "illum")
       {
         tempMaterial.illum = std::stoi(algorithm::tail(curline));
       }
       // Ambient Texture Map
-      if (algorithm::firstToken(curline) == "map_Ka")
+      if (firstToken == "map_Ka")
       {
         tempMaterial.map_Ka = algorithm::tail(curline);
       }
       // Diffuse Texture Map
-      if (algorithm::firstToken(curline) == "map_Kd")
+      if (firstToken == "map_Kd")
       {
         tempMaterial.map_Kd = algorithm::tail(curline);
       }
       // Specular Texture Map
-      if (algorithm::firstToken(curline) == "map_Ks")
+      if (firstToken == "map_Ks")
       {
         tempMaterial.map_Ks = algorithm::tail(curline);
       }
       // Specular Hightlight Map
-      if (algorithm::firstToken(curline) == "map_Ns")
+      if (firstToken == "map_Ns")
       {
         tempMaterial.map_Ns = algorithm::tail(curline);
       }
       // Alpha Texture Map
-      if (algorithm::firstToken(curline) == "map_d")
+      if (firstToken == "map_d")
       {
         tempMaterial.map_d = algorithm::tail(curline);
       }
       // Bump Map
-      if (algorithm::firstToken(curline) == "map_Bump" || algorithm::firstToken(curline) == "map_bump" || algorithm::firstToken(curline) == "bump")
+      if (firstToken == "map_Bump" || firstToken == "map_bump" || firstToken == "bump")
       {
         tempMaterial.map_bump = algorithm::tail(curline);
       }
