@@ -469,8 +469,9 @@ public:
 
     std::vector<Vertex> Vertices;
     std::vector<unsigned int> Indices;
+    std::string matName;
 
-    std::vector<std::string> MeshMatNames;
+    //std::vector<std::string> MeshMatNames;
 
     bool listening = false;
     std::string meshname;
@@ -499,8 +500,7 @@ public:
               << "\t| vertices > " << Positions.size()
               << "\t| texcoords > " << TCoords.size()
               << "\t| normals > " << Normals.size()
-              << "\t| triangles > " << (Vertices.size() / 3)
-              << (!MeshMatNames.empty() ? "\t| material: " + MeshMatNames.back() : "");
+              << "\t| triangles > " << (Vertices.size() / 3);
         }
       }
 #endif
@@ -530,6 +530,7 @@ public:
             // Create Mesh
             tempMesh = Mesh(Vertices, Indices);
             tempMesh.MeshName = meshname;
+            tempMesh.MeshMaterial.name = matName;
 
             // Insert Mesh
             LoadedMeshes.push_back(tempMesh);
@@ -538,6 +539,7 @@ public:
             Vertices.clear();
             Indices.clear();
             meshname.clear();
+            matName.clear();
 
             meshname = algorithm::tail(curline);
           }
@@ -631,9 +633,9 @@ public:
       // Get Mesh Material Name
       if(firstToken == "usemtl")
       {
-        std::string matName = algorithm::tail(curline);
+        matName = algorithm::tail(curline);
         std::cout << "usemtl: '" << matName << "' size: " << matName.size() << std::endl;
-        MeshMatNames.push_back(algorithm::tail(curline));
+        //MeshMatNames.push_back(algorithm::tail(curline));
 
         // Create new Mesh, if Material changes within a group
         if (!Indices.empty() && !Vertices.empty())
@@ -641,6 +643,8 @@ public:
           // Create Mesh
           tempMesh = Mesh(Vertices, Indices);
           tempMesh.MeshName = meshname;
+          tempMesh.MeshMaterial.name = matName;
+
           int i = 2;
           while(1) {
             tempMesh.MeshName = meshname + "_" + std::to_string(i);
@@ -657,6 +661,7 @@ public:
           // Cleanup
           Vertices.clear();
           Indices.clear();
+          matName.clear();
         }
 
 #ifdef OBJL_CONSOLE_OUTPUT
@@ -685,20 +690,24 @@ public:
       // Create Mesh
       tempMesh = Mesh(Vertices, Indices);
       tempMesh.MeshName = meshname;
+      tempMesh.MeshMaterial.name = matName;
 
       // Insert Mesh
       LoadedMeshes.push_back(tempMesh);
     }
 
     // Set Materials for each Mesh
-    for (size_t i = 0; i < MeshMatNames.size(); i++)
+    for (size_t i = 0; i < LoadedMeshes.size(); i++)
     {
-      std::string matname = MeshMatNames[i];
+      //std::string matname = MeshMatNames[i];
+      const std::string& matname = LoadedMeshes[i].MeshMaterial.name;
+      std::cout << "Find material: " << matname << std::endl;
 
       // Find corresponding material name in loaded materials
       // when found copy material variables into mesh material
       for (size_t j = 0; j < LoadedMaterials.size(); j++)
       {
+        std::cout << "    - " << LoadedMaterials[j].name << std::endl;
         if (LoadedMaterials[j].name == matname)
         {
           LoadedMeshes[i].MeshMaterial = LoadedMaterials[j];
