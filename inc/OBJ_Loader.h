@@ -7,6 +7,8 @@
 #include <functional>
 #include <string>
 #include <fstream>
+#include <sstream>
+#include <locale>
 
 #include <math.h>
 
@@ -19,6 +21,19 @@
 //	is needed and used for the OBJ Model Loader
 namespace objl
 {
+
+namespace
+{
+auto readFloat = [](const std::string& s)
+{
+  float v;
+  std::istringstream istr(s);
+  istr.imbue(std::locale("C"));
+  istr >> v;
+  return v;
+};
+}
+
 // Structure: Vector2
 //
 // Description: A 2D Vector that Holds Positional Data
@@ -568,9 +583,9 @@ public:
         Vector3 vpos;
         algorithm::split(algorithm::tail(curline), spos, " ");
 
-        vpos.X = std::stof(spos[0]);
-        vpos.Y = std::stof(spos[1]);
-        vpos.Z = std::stof(spos[2]);
+        vpos.X = readFloat(spos[0]);
+        vpos.Y = readFloat(spos[1]);
+        vpos.Z = readFloat(spos[2]);
 
         Positions.push_back(vpos);
       }
@@ -581,8 +596,8 @@ public:
         Vector2 vtex;
         algorithm::split(algorithm::tail(curline), stex, " ");
 
-        vtex.X = std::stof(stex[0]);
-        vtex.Y = std::stof(stex[1]);
+        vtex.X = readFloat(stex[0]);
+        vtex.Y = readFloat(stex[1]);
 
         TCoords.push_back(vtex);
       }
@@ -593,9 +608,9 @@ public:
         Vector3 vnor;
         algorithm::split(algorithm::tail(curline), snor, " ");
 
-        vnor.X = std::stof(snor[0]);
-        vnor.Y = std::stof(snor[1]);
-        vnor.Z = std::stof(snor[2]);
+        vnor.X = readFloat(snor[0]);
+        vnor.Y = readFloat(snor[1]);
+        vnor.Z = readFloat(snor[2]);
 
         Normals.push_back(vnor);
       }
@@ -1102,9 +1117,9 @@ private:
         if (temp.size() != 3)
           continue;
 
-        tempMaterial.Ka.X = std::stof(temp[0]);
-        tempMaterial.Ka.Y = std::stof(temp[1]);
-        tempMaterial.Ka.Z = std::stof(temp[2]);
+        tempMaterial.Ka.X = readFloat(temp[0]);
+        tempMaterial.Ka.Y = readFloat(temp[1]);
+        tempMaterial.Ka.Z = readFloat(temp[2]);
       }
       // Diffuse Color
       if (firstToken == "Kd")
@@ -1115,9 +1130,9 @@ private:
         if (temp.size() != 3)
           continue;
 
-        tempMaterial.Kd.X = std::stof(temp[0]);
-        tempMaterial.Kd.Y = std::stof(temp[1]);
-        tempMaterial.Kd.Z = std::stof(temp[2]);
+        tempMaterial.Kd.X = readFloat(temp[0]);
+        tempMaterial.Kd.Y = readFloat(temp[1]);
+        tempMaterial.Kd.Z = readFloat(temp[2]);
       }
       // Specular Color
       if (firstToken == "Ks")
@@ -1128,24 +1143,24 @@ private:
         if (temp.size() != 3)
           continue;
 
-        tempMaterial.Ks.X = std::stof(temp[0]);
-        tempMaterial.Ks.Y = std::stof(temp[1]);
-        tempMaterial.Ks.Z = std::stof(temp[2]);
+        tempMaterial.Ks.X = readFloat(temp[0]);
+        tempMaterial.Ks.Y = readFloat(temp[1]);
+        tempMaterial.Ks.Z = readFloat(temp[2]);
       }
       // Specular Exponent
       if (firstToken == "Ns")
       {
-        tempMaterial.Ns = std::stof(algorithm::tail(curline));
+        tempMaterial.Ns = readFloat(algorithm::tail(curline));
       }
       // Optical Density
       if (firstToken == "Ni")
       {
-        tempMaterial.Ni = std::stof(algorithm::tail(curline));
+        tempMaterial.Ni = readFloat(algorithm::tail(curline));
       }
       // Dissolve
       if (firstToken == "d")
       {
-        tempMaterial.d = std::stof(algorithm::tail(curline));
+        tempMaterial.d = readFloat(algorithm::tail(curline));
       }
       // Illumination
       if (firstToken == "illum")
