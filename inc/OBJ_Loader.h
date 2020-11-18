@@ -461,6 +461,7 @@ public:
       std::cout << "Load material: '" << pathtomat << "'" << std::endl;
 #endif
 
+      std::cout << "pathtomat: " << pathtomat << std::endl;
       std::ifstream mtlStream(pathtomat);
 
       if(!mtlStream.is_open())
@@ -686,9 +687,11 @@ public:
 
       // Load Materials
       if (firstToken == "mtllib")
-      {
+      {        
+        std::cout << "mtllib" << std::endl;
         loadMTL(algorithm::tail(curline), [&](std::istream& mtlStream)
         {
+          std::cout << "loadMTL " << std::endl;
           LoadMaterials(mtlStream);
         });
       }
@@ -1066,7 +1069,11 @@ private:
     std::string curline;
     while (std::getline(inputStream, curline))
     {
+      auto a = curline;
       curline = algorithm::trim(curline);
+
+      std::cout << "A: \"" << a << "\" B: \"" << curline << "\"" << std::endl;
+
       std::string firstToken = algorithm::firstToken(curline);
 
       // new material and material name
