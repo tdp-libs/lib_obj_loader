@@ -527,20 +527,11 @@ public:
         if (!listening)
         {
           listening = true;
-
-          //if (firstToken == "o" || firstToken == "g")
-          //{
-            meshname = algorithm::tail(curline);
-          //}
-          //else
-          //{
-          //  meshname = "unnamed";
-          //}
+          meshname = algorithm::tail(curline);
         }
         else
         {
           // Generate the mesh to put into the array
-
           if (!Indices.empty() && !Vertices.empty())
           {
             // Create Mesh
@@ -550,26 +541,15 @@ public:
 
             // Insert Mesh
             LoadedMeshes.push_back(tempMesh);
-
-            // Cleanup
-            Vertices.clear();
-            Indices.clear();
-            meshname.clear();
-            matName.clear();
-
-            meshname = algorithm::tail(curline);
           }
-          else
-          {
-            //if (firstToken == "o" || firstToken == "g")
-            //{
-              meshname = algorithm::tail(curline);
-            //}
-            //else
-            //{
-            //  meshname = "unnamed";
-            //}
-          }
+
+          // Cleanup
+          Vertices.clear();
+          Indices.clear();
+          meshname.clear();
+          matName.clear();
+
+          meshname = algorithm::tail(curline);
         }
 #ifdef OBJL_CONSOLE_OUTPUT
         std::cout << std::endl;
@@ -649,10 +629,6 @@ public:
       // Get Mesh Material Name
       if(firstToken == "usemtl")
       {
-        matName = algorithm::tail(curline);
-        std::cout << "usemtl: '" << matName << "' size: " << matName.size() << std::endl;
-        //MeshMatNames.push_back(algorithm::tail(curline));
-
         // Create new Mesh, if Material changes within a group
         if (!Indices.empty() && !Vertices.empty())
         {
@@ -677,8 +653,11 @@ public:
           // Cleanup
           Vertices.clear();
           Indices.clear();
-          matName.clear();
+          //matName.clear();
         }
+
+        matName = algorithm::tail(curline);
+        std::cout << "usemtl: '" << matName << "' meshname: '" << meshname << "'" << std::endl;
 
 #ifdef OBJL_CONSOLE_OUTPUT
         outputIndicator = 0;
