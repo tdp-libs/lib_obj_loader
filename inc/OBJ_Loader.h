@@ -465,7 +465,10 @@ public:
       std::ifstream mtlStream(pathtomat);
 
       if(!mtlStream.is_open())
+      {
+        errors += "Failed to open material file: " + pathtomat + '\n';
         return;
+      }
 
       closure(mtlStream);
     });
@@ -731,6 +734,8 @@ public:
   std::vector<unsigned int> LoadedIndices;
   // Loaded Material Objects
   std::vector<Material> LoadedMaterials;
+
+  std::string errors;
 
 private:
   // Generate vertices from a list of positions,
