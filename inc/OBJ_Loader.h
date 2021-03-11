@@ -435,7 +435,9 @@ public:
   bool LoadFile(const std::string& path)
   {
     // If the file is not an .obj file return false
-    if (path.substr(path.size() - 4, 4) != ".obj")
+    std::string ext = path.substr(path.size() - 4, 4);
+    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+    if (ext != ".obj")
       return false;
 
     std::ifstream objStream(path);
