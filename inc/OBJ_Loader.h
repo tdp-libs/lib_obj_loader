@@ -332,7 +332,7 @@ std::string trim(const std::string& str,
 // Split a String into a string array at a given token
 inline void split(const std::string &in,
                   std::vector<std::string> &out,
-                  std::string token)
+                  const std::string& token)
 {
   out.clear();
 
@@ -746,7 +746,7 @@ private:
                              const std::vector<Vector3>& iPositions,
                              const std::vector<Vector2>& iTCoords,
                              const std::vector<Vector3>& iNormals,
-                             std::string icurline)
+                             const std::string& icurline)
   {
     std::vector<std::string> sface, svert;
     Vertex vVert;
