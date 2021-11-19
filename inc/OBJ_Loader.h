@@ -445,7 +445,7 @@ public:
     if (!objStream.is_open())
       return false;
 
-    return LoadStreams(objStream, [&](const std::string& fileName, const std::function<void(std::istream&)>& closure)
+    return LoadStreams(objStream, [&](const std::string& filename, const std::function<void(std::istream&)>& closure)
     {
       // Generate a path to the material file
       std::vector<std::string> temp;
@@ -457,7 +457,7 @@ public:
         for (size_t i = 0; i < temp.size() - 1; i++)
           pathtomat += temp[i] + "/";
 
-      pathtomat += fileName;
+      pathtomat += filename;
 
 #ifdef OBJL_CONSOLE_OUTPUT
       std::cout << "Load material: '" << pathtomat << "'" << std::endl;
