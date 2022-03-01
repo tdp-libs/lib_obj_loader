@@ -245,7 +245,7 @@ float AngleBetweenV3(const Vector3 a, const Vector3 b)
 {
   float angle = DotV3(a, b);
   angle /= (MagnitudeV3(a) * MagnitudeV3(b));
-  return angle = acosf(angle);
+  return acosf(angle);
 }
 
 // Projection Calculation of a onto b
